@@ -1,0 +1,20 @@
+on:
+  workflow_dispatch:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0/5 * * * *'
+
+name: faucet amount
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - name: create env file
+        run: |
+          touch .env
+          echo LARK_WEBHOOK=${{ secrets.LARK_WEBHOOK }} >> .env
+          echo ADDRESS=${{ secrets.ADDRESS }} >> .env
+      - run: bun index.ts
