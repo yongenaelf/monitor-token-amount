@@ -1,0 +1,14 @@
+{
+  "name": "monitor-token-amount",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "aelf-sdk": "^3.4.14-beta.1"
+  }
+}
