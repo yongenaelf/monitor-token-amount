@@ -70,21 +70,21 @@ await fetch(webhook_url, {
             [
               {
                 tag: "text",
-                text: `AELF: ${convertELF(aelfAmount.balance)}`,
+                text: `AELF: ${convertELF(aelfAmount.balance)}\n`,
+              },
+              {
+                tag: "text",
+                text: `tDVW: ${convertELF(tdvwAmount.balance)}\n`,
               },
               {
                 tag: "a",
                 text: "Explorer AELF ",
-                href: `https://explorer-test.aelf.io/address/${address}`,
+                href: `https://explorer-test.aelf.io/address/${address}\n`,
               },
               {
                 tag: "a",
                 text: "Explorer tDVW ",
-                href: `https://explorer-test-side02.aelf.io/address/${address}`,
-              },
-              {
-                tag: "text",
-                text: `tDVW: ${convertELF(tdvwAmount.balance)}`,
+                href: `https://explorer-test-side02.aelf.io/address/${address}\n`,
               },
               {
                 tag: "at",
