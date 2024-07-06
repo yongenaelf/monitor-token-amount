@@ -49,9 +49,9 @@ if (!address) throw new Error("missing ADDRESS env var");
 
 const aelfAmount = await getTokenAmount(address, aelf);
 const tdvwAmount = await getTokenAmount(address, tdvw);
+const limit = process.env.LIMIT;
 
 function belowLimit(balance: BigNumber) {
-  const limit = process.env.LIMIT;
   if (!limit) throw new Error("missing LIMIT env var");
 
   return balance.isLessThan(new BigNumber(limit));
@@ -60,50 +60,53 @@ function belowLimit(balance: BigNumber) {
 const AELF_BELOW_LIMIT = belowLimit(aelfAmount);
 const TDVW_BELOW_LIMIT = belowLimit(tdvwAmount);
 
-if (!AELF_BELOW_LIMIT && !TDVW_BELOW_LIMIT) {
-  process.exit(0);
-}
+if (AELF_BELOW_LIMIT || TDVW_BELOW_LIMIT) {
+  const webhook_url = process.env.LARK_WEBHOOK;
 
-const webhook_url = process.env.LARK_WEBHOOK;
+  if (!webhook_url) throw new Error("missing LARK_WEBHOOK env var");
 
-if (!webhook_url) throw new Error("missing LARK_WEBHOOK env var");
-
-await fetch(webhook_url, {
-  method: "POST",
-  body: JSON.stringify({
-    msg_type: "post",
-    content: {
-      post: {
-        en_us: {
-          title: "Faucet Token amount",
-          content: [
-            [
-              {
-                tag: "text",
-                text: `AELF: ${aelfAmount.toString()} ELF\n`,
-              },
-              {
-                tag: "text",
-                text: `tDVW: ${tdvwAmount.toString()} ELF\n`,
-              },
-              {
-                tag: "a",
-                text: "Explorer AELF ",
-                href: `https://explorer-test.aelf.io/address/${address}\n`,
-              },
-              {
-                tag: "a",
-                text: "Explorer tDVW ",
-                href: `https://explorer-test-side02.aelf.io/address/${address}\n`,
-              },
-              {
-                tag: "at",
-                user_id: "all",
-              },
+  await fetch(webhook_url, {
+    method: "POST",
+    body: JSON.stringify({
+      msg_type: "post",
+      content: {
+        post: {
+          en_us: {
+            title: "Faucet Token amount",
+            content: [
+              [
+                {
+                  tag: "limit",
+                  text: `Limit: ${limit} ELF\n`,
+                },
+                {
+                  tag: "text",
+                  text: `AELF: ${aelfAmount.toString()} ELF\n`,
+                },
+                {
+                  tag: "text",
+                  text: `tDVW: ${tdvwAmount.toString()} ELF\n`,
+                },
+                {
+                  tag: "a",
+                  text: "Explorer AELF ",
+                  href: `https://explorer-test.aelf.io/address/${address}\n`,
+                },
+                {
+                  tag: "a",
+                  text: "Explorer tDVW ",
+                  href: `https://explorer-test-side02.aelf.io/address/${address}\n`,
+                },
+                {
+                  tag: "at",
+                  user_id: "all",
+                },
+              ],
             ],
-          ],
+          },
         },
       },
-    },
-  }),
-});
+    }),
+  });
+}
+
