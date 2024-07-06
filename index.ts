@@ -36,9 +36,11 @@ async function getTokenAmount(address: string, aelf: any) {
     symbol: "ELF",
     owner: address,
   });
-  console.log(result);
 
-  return result;
+  const str = result.balance;
+  const bignum = new BigNumber(str).dividedBy(10 ** 8);
+
+  return bignum;
 }
 
 const address = process.env.ADDRESS;
@@ -48,10 +50,18 @@ if (!address) throw new Error("missing ADDRESS env var");
 const aelfAmount = await getTokenAmount(address, aelf);
 const tdvwAmount = await getTokenAmount(address, tdvw);
 
-function convertELF(balance: string) {
-  const elf = new BigNumber(balance).dividedBy(10 ** 8).toString();
+function belowLimit(balance: BigNumber) {
+  const limit = process.env.LIMIT;
+  if (!limit) throw new Error("missing LIMIT env var");
 
-  return `${elf} ELF`;
+  return balance.isLessThan(new BigNumber(limit));
+}
+
+const AELF_BELOW_LIMIT = belowLimit(aelfAmount);
+const TDVW_BELOW_LIMIT = belowLimit(tdvwAmount);
+
+if (!AELF_BELOW_LIMIT && !TDVW_BELOW_LIMIT) {
+  process.exit(0);
 }
 
 const webhook_url = process.env.LARK_WEBHOOK;
@@ -70,11 +80,11 @@ await fetch(webhook_url, {
             [
               {
                 tag: "text",
-                text: `AELF: ${convertELF(aelfAmount.balance)}\n`,
+                text: `AELF: ${aelfAmount.toString()} ELF\n`,
               },
               {
                 tag: "text",
-                text: `tDVW: ${convertELF(tdvwAmount.balance)}\n`,
+                text: `tDVW: ${tdvwAmount.toString()} ELF\n`,
               },
               {
                 tag: "a",

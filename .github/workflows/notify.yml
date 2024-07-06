@@ -2,14 +2,14 @@ on:
   workflow_dispatch:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '0/5 * * * *'
+    - cron:  '0 10 * * *'
 
 name: faucet amount
 jobs:
   alert:
     runs-on: ubuntu-latest
     env:
-      LIMIT: "40000"
+      LIMIT: "Infinity" # always notify
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2

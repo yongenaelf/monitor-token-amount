@@ -19,4 +19,5 @@ This project was created using `bun init` in bun v1.1.10. [Bun](https://bun.sh) 
 ```sh
 LARK_WEBHOOK=
 ADDRESS=
+LIMIT=
 ```
